@@ -1,7 +1,7 @@
 {
     "name": "translatorplus",
     "displayName": "Translator Plus",
-    "description": "",
+    "description": "Translator using google translation, press CTRL + T to start",
     "version": "1.0.0",
     "publisher": "lkytal",
 	"icon": "icon.png",
@@ -26,6 +26,12 @@
     ],
     "main": "./out/src/extension",
     "contributes": {
+		"commands": [
+			{
+				"command": "translatorplus.toggleTranslator",
+				"title": "Toggle Translator"
+			}
+		],
         "keybindings": [
             {
                 "command": "translatorplus.toggleTranslator",

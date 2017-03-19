@@ -4,17 +4,17 @@ import { window, workspace, commands, Disposable, ExtensionContext, StatusBarAli
 import * as WebRequest from 'web-request';
 
 export function activate(context: ExtensionContext) {
-    let cfg = workspace.getConfiguration();
+	let cfg = workspace.getConfiguration();
 
-    let proxy = String(cfg.get("http.proxy"));
-    let targetLanguage = String(cfg.get("translatorplus.targetLanguage"));
+	let proxy = String(cfg.get("http.proxy"));
+	let targetLanguage = String(cfg.get("translatorplus.targetLanguage"));
 
-    let translator = new Translator(proxy, targetLanguage);
-    context.subscriptions.push(translator);
+	let translator = new Translator(proxy, targetLanguage);
+	context.subscriptions.push(translator);
 
-    context.subscriptions.push(commands.registerCommand('translatorplus.toggleTranslator', () => {
-        translator.toggle();
-    }));
+	context.subscriptions.push(commands.registerCommand('translatorplus.toggleTranslator', () => {
+		translator.toggle();
+	}));
 }
 
 // this method is called when your extension is deactivated
@@ -22,82 +22,84 @@ export function deactivate() {
 }
 
 class Translator {
-    private statusBarItem: StatusBarItem;
-    private disposable: Disposable;
-    private active: boolean = false;
+	private statusBarItem: StatusBarItem;
+	private disposable: Disposable;
+	private active: boolean = false;
 
-    constructor(public proxy: string = "", public targetLanguage: string = "") {
-        if (!this.statusBarItem) {
-            this.statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
-            this.statusBarItem.text = '$(globe)  Waiting...';
-        }
+	constructor(public proxy: string = "", public targetLanguage: string = "") {
+		if (!this.statusBarItem) {
+			this.statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
+			this.setText('Waiting...');
+		}
 
-        let subscriptions: Disposable[] = [];
-        window.onDidChangeTextEditorSelection(this.updateTranslate, this, subscriptions);
-        this.disposable = Disposable.from(...subscriptions);
-        this.updateTranslate();
-    }
+		let subscriptions: Disposable[] = [];
+		window.onDidChangeTextEditorSelection(this.updateTranslate, this, subscriptions);
+		this.disposable = Disposable.from(...subscriptions);
+		this.updateTranslate();
+	}
 
-    public activate() {
-        this.active = true;
-        this.statusBarItem.show();
-        window.showInformationMessage('Translator Plus enabled');
-    }
+	private setText(str) {
+		this.statusBarItem.text = '$(globe) ' + str;
+	}
 
-    public deactivate() {
-        this.active = false;
-        this.statusBarItem.hide();
-        window.showInformationMessage('Translator Plus disabled');
-    }
+	public activate() {
+		this.active = true;
+		this.statusBarItem.show();
+		window.showInformationMessage('Translator Plus enabled');
+	}
 
-    public toggle() {
-        if (this.active) {
-            this.deactivate();
-        }
-        else {
-            this.activate();
-        }
-    }
+	public deactivate() {
+		this.active = false;
+		this.statusBarItem.hide();
+		window.showInformationMessage('Translator Plus disabled');
+	}
 
-    public updateTranslate() {
-        if (!this.active) {
-            return;
-        }
+	public toggle() {
+		if (this.active) {
+			this.deactivate();
+		}
+		else {
+			this.activate();
+		}
+	}
 
-        let str = window.activeTextEditor.document.getText(window.activeTextEditor.selection).trim();
+	public updateTranslate() {
+		if (!this.active) {
+			return;
+		}
 
-        if (str == '') {
-            return;
-        }
+		let str = window.activeTextEditor.document.getText(window.activeTextEditor.selection).trim();
 
-        this.dotranslate(encodeURIComponent(str), this.proxy, this.targetLanguage);
-    }
+		if (str == '') {
+			return;
+		}
 
-    private dotranslate(str, proxy, targetLanguage) {
-        let statusBarItem = this.statusBarItem;
-        let translateStr = this.googleTranslate(str, targetLanguage);
+		this.dotranslate(encodeURIComponent(str), this.proxy, this.targetLanguage);
+	}
 
-        this.statusBarItem.text = '$(globe)  Waiting...';
+	private dotranslate(str, proxy, targetLanguage) {
+		let translateStr = this.googleTranslate(str, targetLanguage);
 
-        WebRequest.get(translateStr, { "proxy": proxy }).then(function (TResult) {
-            let res = JSON.parse(TResult.content.toString());
+		this.setText('Waiting...');
 
-            var result = []
-            res.sentences.forEach(function (item) {
-                result.push(item.trans)
-            })
+		WebRequest.get(translateStr, { "proxy": proxy }).then((TResult) => {
+			let res = JSON.parse(TResult.content.toString());
 
-            statusBarItem.text = "$(globe)  " + str + " : " + result.join(',');
-            statusBarItem.show();
-        });
-    }
+			var result = [];
+			res.sentences.forEach(function (item) {
+				result.push(item.trans);
+			})
 
-    private googleTranslate(str, targetLanguage) {
-        return 'https://translate.google.cn/translate_a/single?client=gtx&sl=auto&tl=' + (targetLanguage || 'auto') + '&hl=zh-CN&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q=' + str;
-    }
+			this.setText(str + " : " + result.join(','));
+		});
+	}
 
-    public dispose() {
-        this.statusBarItem.dispose();
-        this.disposable.dispose();
-    }
+	private googleTranslate(str, targetLanguage) {
+		return 'https://translate.google.cn/translate_a/single?client=gtx&sl=auto&tl=' + (targetLanguage || 'auto') + '&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q=' + str;
+	}
+
+	public dispose() {
+		this.statusBarItem.dispose();
+		this.disposable.dispose();
+	}
 }
