@@ -2,7 +2,7 @@
     "name": "translatorplus",
     "displayName": "Translator Plus",
     "description": "Translator using google translation, press CTRL + T to start",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "publisher": "lkytal",
 	"icon": "icon.png",
     "engines": {

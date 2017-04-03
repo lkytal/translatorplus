@@ -3,13 +3,15 @@
 import { window, workspace, commands, Disposable, ExtensionContext, StatusBarAlignment, StatusBarItem, TextDocument } from 'vscode';
 import * as WebRequest from 'web-request';
 
+let translator: Translator;
+
 export function activate(context: ExtensionContext) {
-	let cfg = workspace.getConfiguration();
+	let config = workspace.getConfiguration();
 
-	let proxy = String(cfg.get("http.proxy"));
-	let targetLanguage = String(cfg.get("translatorplus.targetLanguage"));
+	let proxy = String(config.get("http.proxy"));
+	let targetLanguage = String(config.get("translatorplus.targetLanguage"));
 
-	let translator = new Translator(proxy, targetLanguage);
+	translator = new Translator(proxy, targetLanguage);
 	context.subscriptions.push(translator);
 
 	context.subscriptions.push(commands.registerCommand('translatorplus.toggleTranslator', () => {
@@ -17,7 +19,6 @@ export function activate(context: ExtensionContext) {
 	}));
 }
 
-// this method is called when your extension is deactivated
 export function deactivate() {
 }
 
@@ -26,10 +27,14 @@ class Translator {
 	private disposable: Disposable;
 	private active: boolean = false;
 
-	constructor(public proxy: string = "", public targetLanguage: string = "") {
+	constructor(public proxy: string = "", public targetLanguage: string = "auto") {
 		if (!this.statusBarItem) {
 			this.statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
 			this.setText('Waiting...');
+		}
+
+		if(this.targetLanguage == '') {
+			this.targetLanguage = 'auto';
 		}
 
 		let subscriptions: Disposable[] = [];
@@ -95,7 +100,7 @@ class Translator {
 	}
 
 	private googleTranslate(str, targetLanguage) {
-		return 'https://translate.google.cn/translate_a/single?client=gtx&sl=auto&tl=' + (targetLanguage || 'auto') + '&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q=' + str;
+		return 'https://translate.google.cn/translate_a/single?client=gtx&sl=auto&tl=' + targetLanguage + '&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q=' + str;
 	}
 
 	public dispose() {
