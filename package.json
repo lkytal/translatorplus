@@ -2,14 +2,15 @@
     "name": "translatorplus",
     "displayName": "Translator Plus",
     "description": "Translator using google translation, press CTRL + T to start",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "publisher": "lkytal",
 	"icon": "icon.png",
     "engines": {
         "vscode": "^1.10.0"
     },
     "categories": [
-        "Other"
+        "Other",
+        "Linters"
     ],
 	"keywords": [
 		"Translate",
@@ -30,13 +31,23 @@
 			{
 				"command": "translatorplus.toggleTranslator",
 				"title": "Toggle Translator"
-			}
+			},
+            {
+                "command": "translatorplus.replaceByTranslation",
+                "title": "Replace selection by translation"
+            }
 		],
         "keybindings": [
             {
                 "command": "translatorplus.toggleTranslator",
                 "key": "ctrl+t",
                 "mac": "cmd+t",
+                "when": "editorTextFocus"
+            },
+            {
+                "command": "translatorplus.replaceByTranslation",
+                "key": "ctrl+shift+t",
+                "mac": "cmd+shift+t",
                 "when": "editorTextFocus"
             }
         ],
@@ -47,7 +58,7 @@
                 "translatorplus.targetLanguage": {
                     "type": "string",
                     "default": "",
-                    "description": "target language id, like en-US, zh-CN, leave empty for auto detect."
+                    "description": "target language id, like en-US, zh-CN, leave empty for auto detection."
                 }
             }
         }
@@ -59,11 +70,11 @@
         "test": "node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "typescript": "^2.2.1",
+        "typescript": "^2.3.2",
         "vscode": "^1.1.0",
-        "mocha": "^3.2.0",
-        "@types/node": "^7.0.8",
-        "@types/mocha": "^2.2.40"
+        "mocha": "^3.3.0",
+        "@types/node": "^7.0.18",
+        "@types/mocha": "^2.2.41"
     },
     "dependencies": {
         "dom-parser": "^0.1.5",

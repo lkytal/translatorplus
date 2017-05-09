@@ -1,5 +1,7 @@
 # Translator Plus
 
+[![Dependency status](https://david-dm.org/lkytal/translatorplus.svg)](https://david-dm.org/lkytal/translatorplus.svg)
+
 ## Features
 
 Translate your selection using google translation, the result will show up in statusbar.
@@ -7,6 +9,8 @@ Translate your selection using google translation, the result will show up in st
 ### How to use
 
 Press CTRL + T to toggle translator. You can also press "ctrl + shift + p" and search for this command.
+
+Press CTRL + SHIFT + T to replace selection by translate result.
 
 Note: will respect "http.proxy" in user-settings.
 
@@ -24,7 +28,7 @@ This extension contributes the following settings:
 
 * `translatorplus.targetLanguage`: Target language id of translation, leave blank for auto detection. Refer [https://cloud.google.com/translate/docs/languages](https://cloud.google.com/translate/docs/languages) for details.
 
-> Install [Tanslator Plus](https://marketplace.visualstudio.com/items?itemName=lkytal.translatorplus) via VSCode market.
+> Install [Translator Plus](https://marketplace.visualstudio.com/items?itemName=lkytal.translatorplus) via VSCode market.
 
 ## My Other extensions
 
@@ -34,6 +38,10 @@ This extension contributes the following settings:
 * ### [Pomodoro](https://marketplace.visualstudio.com/items?itemName=lkytal.pomodoro)
 
 ## Release Notes
+
+### 1.1.0
+
+Feature added: Replace selection by translate result.
 
 ### 1.0.1
 

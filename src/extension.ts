@@ -17,6 +17,10 @@ export function activate(context: ExtensionContext) {
 	context.subscriptions.push(commands.registerCommand('translatorplus.toggleTranslator', () => {
 		translator.toggle();
 	}));
+
+	context.subscriptions.push(commands.registerCommand('translatorplus.replaceByTranslation', () => {
+		translator.doReplace();
+	}));
 }
 
 export function deactivate() {
@@ -33,7 +37,7 @@ class Translator {
 			this.setText('Waiting...');
 		}
 
-		if(this.targetLanguage == '') {
+		if (this.targetLanguage == '') {
 			this.targetLanguage = 'auto';
 		}
 
@@ -79,10 +83,12 @@ class Translator {
 			return;
 		}
 
-		this.dotranslate(encodeURIComponent(str), this.proxy, this.targetLanguage);
+		this.doTranslate(encodeURIComponent(str), this.proxy, this.targetLanguage, (result) => {
+			this.setText(str + " : " + result.join(','));
+		});
 	}
 
-	private dotranslate(str, proxy, targetLanguage) {
+	public doTranslate(str, proxy, targetLanguage, callback) {
 		let translateStr = this.googleTranslate(str, targetLanguage);
 
 		this.setText('Waiting...');
@@ -91,11 +97,26 @@ class Translator {
 			let res = JSON.parse(TResult.content.toString());
 
 			var result = [];
-			res.sentences.forEach(function (item) {
+			for (let item of res.sentences) {
 				result.push(item.trans);
-			})
+			}
 
-			this.setText(str + " : " + result.join(','));
+			callback(result);
+		});
+	}
+
+	public doReplace() {
+		let str = window.activeTextEditor.document.getText(window.activeTextEditor.selection).trim();
+
+		if (str == '') {
+			return;
+		}
+
+		this.doTranslate(encodeURIComponent(str), this.proxy, this.targetLanguage, (result) => {
+			let editor = window.activeTextEditor;
+			editor.edit((edit) => {
+				edit.replace(editor.selection, result[0]);
+			});
 		});
 	}
 
