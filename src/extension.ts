@@ -8,10 +8,7 @@ let translator: Translator;
 export function activate(context: ExtensionContext) {
 	let config = workspace.getConfiguration();
 
-	let proxy = String(config.get("http.proxy"));
-	let targetLanguage = String(config.get("translatorplus.targetLanguage"));
-
-	translator = new Translator(proxy, targetLanguage);
+	translator = new Translator(config);
 	context.subscriptions.push(translator);
 
 	context.subscriptions.push(commands.registerCommand('translatorplus.toggleTranslator', () => {
@@ -30,20 +27,24 @@ class Translator {
 	private statusBarItem: StatusBarItem;
 	private disposable: Disposable;
 	private active: boolean = false;
+	private targetLanguage = 'auto';
+	private proxy = '';
 
-	constructor(public proxy: string = "", public targetLanguage: string = "auto") {
+	constructor(private config = workspace.getConfiguration()) {
 		if (!this.statusBarItem) {
 			this.statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
 			this.setText('Waiting...');
 		}
 
-		if (this.targetLanguage == '') {
-			this.targetLanguage = 'auto';
-		}
+		this.config = config;
+
+		this.proxy = String(this.config.get("http.proxy"));
+		this.targetLanguage = this.config.get("translatorplus.targetLanguage") || 'auto';
 
 		let subscriptions: Disposable[] = [];
 		window.onDidChangeTextEditorSelection(this.updateTranslate, this, subscriptions);
 		this.disposable = Disposable.from(...subscriptions);
+
 		this.updateTranslate();
 	}
 
@@ -120,8 +121,9 @@ class Translator {
 		});
 	}
 
-	private googleTranslate(str, targetLanguage) {
-		return 'https://translate.google.cn/translate_a/single?client=gtx&sl=auto&tl=' + targetLanguage + '&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q=' + str;
+	private googleTranslate(str, targetLanguage, sourceLanguage = 'auto') {
+		return 'https://translate.google.cn/translate_a/single?client=gtx&sl=' + sourceLanguage
+		 + '&tl=' + targetLanguage + '&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q=' + str;
 	}
 
 	public dispose() {

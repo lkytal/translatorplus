@@ -4,7 +4,7 @@
 
 ## Features
 
-Translate your selection using google translation, the result will show up in statusbar.
+Translate your selection using google translation, the result will show up in the status bar.
 
 ### How to use
 
@@ -18,7 +18,7 @@ Note: will respect "http.proxy" in user-settings.
 
 ![Preview](screenshot.png)
 
-Result will shows up in statusbar:
+The result will show up in the status bar:
 
 ![Preview](statusbar.png)
 
