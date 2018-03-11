@@ -39,6 +39,10 @@ This extension contributes the following settings:
 
 ## Release Notes
 
+### 1.1.2
+
+Update dependencies.
+
 ### 1.1.0
 
 Feature added: Replace selection by translate result.
