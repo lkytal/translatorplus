@@ -87,7 +87,7 @@ class Translator {
 		});
 	}
 
-	public doTranslate(str, proxy, targetLanguage, callback) {
+	public doTranslate(str: string, proxy, targetLanguage: string, callback) {
 		let translateStr = this.googleTranslate(str, targetLanguage);
 
 		this.setText("Waiting...");
@@ -111,7 +111,7 @@ class Translator {
 			return;
 		}
 
-		this.doTranslate(encodeURIComponent(str), this.proxy, this.targetLanguage, (result) => {
+		this.doTranslate(encodeURIComponent(str), this.proxy, this.targetLanguage, (result: string[]) => {
 			let editor = window.activeTextEditor;
 			editor.edit((edit) => {
 				edit.replace(editor.selection, result[0]);
@@ -124,12 +124,12 @@ class Translator {
 		this.disposable.dispose();
 	}
 
-	private googleTranslate(str, targetLanguage, sourceLanguage = "auto") {
+	private googleTranslate(str: string, targetLanguage: string, sourceLanguage = "auto") {
 		return "https://translate.google.cn/translate_a/single?client=gtx&sl=" + sourceLanguage
 		 + "&tl=" + targetLanguage + "&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q=" + str;
 	}
 
-	private setText(str) {
+	private setText(str: string) {
 		this.statusBarItem.text = "$(globe) " + str;
 	}
 }
